@@ -1,0 +1,1 @@
+npm install clsx recharts msql2 jspdf jspdf-autotable

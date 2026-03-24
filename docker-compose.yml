@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: si-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sym_ad
+      MYSQL_USER: si_user
+      MYSQL_PASSWORD: si_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: si-dashboard
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=si_user
+      - DB_PASSWORD=si_password
+      - DB_NAME=sym_ad
+      - COOKIE_SECRET=${COOKIE_SECRET:?Définir COOKIE_SECRET dans .env (min 32 car.)}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

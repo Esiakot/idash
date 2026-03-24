@@ -1,0 +1,584 @@
+/* ============================================
+   Styles partagés — pages SI (annuaire, ordinateurs…)
+   ============================================ */
+
+/* --- Layout --- */
+
+.container {
+  display: flex;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--primary);
+  background: var(--primary-bg);
+}
+
+/* --- Sidebar --- */
+
+.sidebar {
+  width: 12vw;
+  height: 90vh;
+  background: var(--primary);
+  color: #fff;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  gap: 0.75rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+  color: #fff;
+  font-size: 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* --- Filtres --- */
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+}
+
+.filterCard {
+  background: var(--primary);
+  color: #fff;
+}
+
+.sectionTitle,
+.filters strong {
+  color: #fff;
+  display: block;
+  margin: 0.8rem 0 0.3rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filters label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.85rem;
+  transition: color 0.2s ease;
+}
+
+.filters label:hover {
+  color: var(--accent);
+}
+
+/* --- Contenu principal --- */
+
+.mainContent {
+  height: 90vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+/* --- Toolbar --- */
+
+.toolbar {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--gradient-toolbar);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+}
+
+.toolbar button {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toolbar button:hover {
+  background-color: var(--primary-dark);
+}
+
+.rightTool {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* --- Tableau wrapper --- */
+
+.tableWrapper {
+  flex: 1;
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid var(--primary);
+  background: #fff;
+}
+
+/* --- Tableau --- */
+
+.table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--primary);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.table th {
+  background: var(--primary-light);
+  position: sticky;
+  top: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  z-index: 2;
+}
+
+.table th.sorted-asc::after {
+  content: " ▲";
+}
+
+.table th.sorted-desc::after {
+  content: " ▼";
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #e6f0ff;
+}
+
+.table tbody tr:hover {
+  background-color: #a2b7d6;
+  transition: background-color 0.2s ease;
+}
+
+.table td {
+  white-space: nowrap;
+}
+
+/* --- Colonnes groupes --- */
+
+.table th.group-col,
+.table td.group-col {
+  width: 1rem;
+  max-width: 1rem;
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.75rem;
+  cursor: default;
+  position: relative;
+}
+
+.table th.group-col span,
+.table td.group-col span {
+  display: inline-block;
+  max-width: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table th.group-col:hover span::after,
+.table td.group-col:hover span::after {
+  content: attr(data-full);
+  position: absolute;
+  top: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 2px 5px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.groupCol {
+  height: 8rem;
+  width: 1rem;
+  max-width: 1rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.groupCheck {
+  color: blue;
+}
+
+/* --- Pastilles activité --- */
+
+.activity-badge {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.activity-active {
+  background-color: limegreen;
+}
+
+.activity-inactive {
+  background-color: red;
+}
+
+/* --- États --- */
+
+.loading,
+.error {
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: var(--primary);
+  text-align: center;
+}
+
+.error {
+  color: red;
+}
+
+/* --- Ordinateurs inline overrides --- */
+
+.unassigned {
+  color: #dc3545;
+}
+
+.badgeGap {
+  margin-right: 8px;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.statsSection {
+  margin-top: 1rem;
+}
+
+.statsList {
+  list-style: none;
+  padding-left: 0;
+  line-height: 1.6;
+}
+
+/* --- Divers --- */
+
+.catname1 {
+  color: #66a3ff;
+}
+
+/* --- Chips --- */
+
+.chipRow {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip,
+.chipButton {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  background: var(--primary-lighter);
+  color: var(--primary);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.chip:hover,
+.chipButton:hover {
+  background: #dce9ff;
+  border-color: var(--primary-dark);
+}
+
+.chipFixed {
+  width: 120px;
+  justify-content: space-between;
+}
+
+.chipLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipButton:active {
+  transform: translateY(1px);
+}
+
+.chipButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chipClose {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.chipClose:hover {
+  color: var(--primary-dark);
+}
+
+.muted {
+  color: #6b7a99;
+}
+
+/* --- Modal --- */
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  padding: 1rem;
+  background: rgba(0, 16, 51, 0.45);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: min(680px, 100%);
+  background: #fff;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transform: scale(0.98);
+  opacity: 0;
+  animation: modalIn 160ms ease-out forwards;
+}
+
+@keyframes modalIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  background: var(--gradient-toolbar);
+  border-bottom: 1px solid var(--primary);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modalClose {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  border-radius: 6px;
+}
+
+.modalClose:hover {
+  background: rgba(0, 51, 160, 0.08);
+}
+
+.modalBody {
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #99c2ff;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.15);
+}
+
+.pcList {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid #cfe0ff;
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: #fbfdff;
+}
+
+.pcOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.pcOption:hover {
+  background: var(--primary-lighter);
+}
+
+.pcOption input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+.modalFooter {
+  padding: 0.8rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  border-top: 1px solid #cfe0ff;
+  background: #f7faff;
+}
+
+/* --- Boutons --- */
+
+.btnPrimary,
+.btnSecondary,
+.btnDanger {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.btnPrimary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btnSecondary {
+  background-color: var(--primary-lighter);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btnSecondary:hover {
+  background-color: #dce9ff;
+}
+
+.btnDanger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btnDanger:hover {
+  background-color: #b02a37;
+}
+
+/* --- Formulaire inline (ajout téléphone, etc.) --- */
+
+.inlineRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.inputNarrow {
+  width: 140px;
+}
+
+.inputMedium {
+  width: 160px;
+}
+
+/* --- Grille éditable (téléphones) --- */
+
+.editGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.editGridHeader {
+  font-weight: 600;
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* --- Texte secondaire --- */
+
+.smallMuted {
+  opacity: 0.7;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 480px) {
+  .modal {
+    border-radius: 10px;
+  }
+  .pcList {
+    max-height: 260px;
+  }
+  .btnPrimary,
+  .btnSecondary,
+  .btnDanger {
+    padding: 0.4rem 0.8rem;
+  }
+}

@@ -1,0 +1,67 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.modal {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(15px);
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 24rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.titreModale {
+  display: flex;
+  justify-content: center;
+  color: var(--primary);
+  width: 100%;
+  background: transparent;
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.input {
+  border: none;
+  width: 100%;
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.4rem 1rem;
+  border: none;
+  width: 8.5rem;
+  background: #444;
+  color: #fff;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #666;
+}
+
+.error {
+  color: red;
+  font-size: 1rem;
+}
