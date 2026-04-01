@@ -2,7 +2,7 @@ services:
   db:
     image: mysql:8.0
     container_name: si-mysql
-    restart: unless-stopped
+    restart: "no"
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: sym_ad
@@ -37,7 +37,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: unless-stopped
+    restart: "no"
 
 volumes:
   mysql_data:

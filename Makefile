@@ -1,1 +1,1 @@
-npm install clsx recharts msql2 jspdf jspdf-autotable
+npm install mysql2 jspdf jspdf-autotable
