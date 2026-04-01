@@ -5,7 +5,8 @@ import UserComputers from "./UserComputers";
 import UserPhones from "./UserPhones";
 import styles from "@/styles/si/shared.module.css";
 import type { Ordinateur, Telephone, Utilisateur, SortDirection } from "@/types";
-import { truncateText } from "@/utils/formatters";
+import { truncateText, flagOn } from "@/utils/formatters";
+import { ACTIVITY_STATUS } from "@/constants";
 
 type AnnuaireTableProps = {
   users: Utilisateur[];
@@ -16,7 +17,6 @@ type AnnuaireTableProps = {
   onHeaderClick: (col: string) => void;
   hoveredGroup: string | null;
   setHoveredGroup: (g: string | null) => void;
-  flagOn: (val: any) => boolean;
 
   computersByUserId?: Record<number, Ordinateur[]>;
   phonesByUserId?: Record<number, Telephone[]>;
@@ -40,7 +40,6 @@ export default function AnnuaireTable({
   onHeaderClick,
   hoveredGroup,
   setHoveredGroup,
-  flagOn,
   computersByUserId = {},
   phonesByUserId = {},
   isServiceInfo = false,
@@ -133,7 +132,7 @@ export default function AnnuaireTable({
                       >
                         <span
                           className={`${styles["activity-badge"]} ${
-                            user.activite === "Actif"
+                            user.activite === ACTIVITY_STATUS.ACTIF
                               ? styles["activity-active"]
                               : styles["activity-inactive"]
                           }`}

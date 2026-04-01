@@ -1,4 +1,4 @@
-import mysql from "mysql2/promise";
+import mysql, { PoolConnection } from "mysql2/promise";
 import { DB_CONFIG } from "@/constants";
 
 let pool: mysql.Pool | null = null;
@@ -17,4 +17,26 @@ export function getPool() {
     });
   }
   return pool;
+}
+
+/**
+ * Exécute une série d'opérations dans une transaction
+ * Gère automatiquement commit/rollback/release
+ */
+export async function withTransaction<T>(
+  callback: (connection: PoolConnection) => Promise<T>
+): Promise<T> {
+  const connection = await getPool().getConnection();
+
+  try {
+    await connection.beginTransaction();
+    const result = await callback(connection);
+    await connection.commit();
+    return result;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 }

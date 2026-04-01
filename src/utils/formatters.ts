@@ -6,7 +6,7 @@ export function flagOn(val: any): boolean {
   if (typeof val === "boolean") return val;
   if (typeof val === "number") return val !== 0;
   // Real Buffer (server-side mysql2 BIT(1))
-  if (Buffer.isBuffer(val)) return val[0] !== 0;
+  if (typeof Buffer !== "undefined" && Buffer.isBuffer(val)) return val[0] !== 0;
   // Serialized Buffer (JSON from API response)
   if (
     typeof val === "object" &&
@@ -18,23 +18,6 @@ export function flagOn(val: any): boolean {
   const s = String(val).trim().toLowerCase();
   return ["1", "true", "✔", "x", "yes", "oui"].includes(s);
 }
-
-export const formatEuro = (value: number | undefined) => {
-  return (value ?? 0)
-    .toFixed(2)
-    .replace(".", ",")
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
-
-export const formatPourcentage = (dep: number, prev: number) => {
-  if (!prev || prev === 0) return "N/A";
-  return ((dep / prev) * 100).toFixed(1).replace(".", ",") + " %";
-};
-
-export const formatDate = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("fr-FR");
-};
 
 /**
  * Tronque un texte à une longueur maximale avec "…" si dépassement
@@ -76,4 +59,13 @@ export function prettifyGroupKey(
   label = label.replace(/^Glo\b/, "Glo");
 
   return label;
+}
+
+/**
+ * Formate un numéro de téléphone en groupes de 2 chiffres : "06 00 00 00 00"
+ * Ne garde que les chiffres, limité à 10.
+ */
+export function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  return digits.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
 }

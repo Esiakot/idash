@@ -1,11 +1,7 @@
 // src/lib/api-wrapper.ts
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-
-/**
- * Type pour les handlers d'API
- */
-type ApiHandler = (req: NextRequest, context?: any) => Promise<NextResponse>;
+import type { ApiHandler } from "@/types";
+import { HTTP_STATUS, ERROR_MESSAGES, MYSQL_ERRORS } from "@/constants";
 
 /**
  * Erreur API personnalisée
@@ -13,7 +9,7 @@ type ApiHandler = (req: NextRequest, context?: any) => Promise<NextResponse>;
 export class ApiError extends Error {
   constructor(
     public message: string,
-    public statusCode: number = 500,
+    public statusCode: number = HTTP_STATUS.INTERNAL_ERROR,
     public details?: any
   ) {
     super(message);
@@ -44,45 +40,31 @@ export function withErrorHandler(handler: ApiHandler): ApiHandler {
         );
       }
 
-      // Erreur de validation Zod
-      if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          {
-            error: "Données invalides",
-            details: error.issues.map((e: z.ZodIssue) => ({
-              field: e.path.join("."),
-              message: e.message,
-            })),
-          },
-          { status: 400 }
-        );
-      }
-
       // Erreurs MySQL spécifiques
-      if (error?.code === "ER_DUP_ENTRY") {
+      if (error?.code === MYSQL_ERRORS.DUPLICATE_ENTRY) {
         return NextResponse.json(
-          { error: "Cette entrée existe déjà" },
-          { status: 409 }
+          { error: ERROR_MESSAGES.DUPLICATE_ENTRY },
+          { status: HTTP_STATUS.CONFLICT }
         );
       }
 
-      if (error?.code === "ER_NO_REFERENCED_ROW_2") {
+      if (error?.code === MYSQL_ERRORS.REFERENCE_ERROR) {
         return NextResponse.json(
-          { error: "L'entité référencée n'existe pas" },
-          { status: 404 }
+          { error: ERROR_MESSAGES.REFERENCE_ERROR },
+          { status: HTTP_STATUS.NOT_FOUND }
         );
       }
 
       // Erreur générique
       return NextResponse.json(
         {
-          error: "Erreur interne du serveur",
+          error: ERROR_MESSAGES.INTERNAL_ERROR,
           message:
             process.env.NODE_ENV === "development"
               ? error?.message
               : undefined,
         },
-        { status: 500 }
+        { status: HTTP_STATUS.INTERNAL_ERROR }
       );
     }
   };

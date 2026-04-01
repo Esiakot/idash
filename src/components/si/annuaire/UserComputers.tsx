@@ -3,8 +3,6 @@
 import styles from "@/styles/si/shared.module.css";
 import type { Ordinateur } from "@/types";
 
-export type { Ordinateur };
-
 export default function UserComputers({
   pcs,
   canEdit = false,

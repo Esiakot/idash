@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import styles from "@/styles/si/shared.module.css";
-import { API_ROUTES } from "@/constants";
-import { formatPhone } from "@/utils/phone-formatter";
+import { API_ROUTES, ERROR_MESSAGES } from "@/constants";
+import { formatPhone } from "@/utils/formatters";
 
 type Props = {
   open: boolean;
@@ -63,15 +63,15 @@ export default function MobileEditorModal({
       }
 
       if (!res.ok) {
-        throw new Error(j?.error || text || "Échec de la mise à jour");
+        throw new Error(j?.error || text || ERROR_MESSAGES.UPDATE_FAILED);
       }
 
-      // Si la DB renvoie null, on reflète "" dans l’UI
+      // Si la DB renvoie null, on reflète "" dans l'UI
       const newVal = j?.mobiles == null ? "" : String(j.mobiles);
       onSaved(newVal);
       onClose();
     } catch (e: any) {
-      setErr(e?.message || "Erreur réseau");
+      setErr(e?.message || ERROR_MESSAGES.NETWORK_ERROR);
     } finally {
       setLoading(false);
     }

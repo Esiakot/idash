@@ -13,7 +13,7 @@ export default function HubGrid({ title, subtitle }: HubGridProps) {
       <p className={styles.subtitle}>{subtitle}</p>
 
       <div className={styles.grid}>
-        <Link href="/si/annuaire">
+        <Link href="/annuaire">
           <div className={styles.card}>
             <span className={styles.cardIcon}>📇</span>
             <h2>Annuaire</h2>
@@ -28,7 +28,7 @@ export default function HubGrid({ title, subtitle }: HubGridProps) {
             </ul>
           </div>
         </Link>
-        <Link href="/si/ordinateurs">
+        <Link href="/ordinateurs">
           <div className={styles.card}>
             <span className={styles.cardIcon}>💻</span>
             <h2>Ordinateurs</h2>

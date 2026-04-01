@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "@/libs/db";
 import { requireAuth, requireGroup } from "@/middleware/auth-middleware";
-import { withErrorHandler } from "@/libs/api-wrapper";
+import { withErrorHandler, ApiError } from "@/libs/api-wrapper";
 import { validateRequest } from "@/utils/request-helpers";
-import { withTransaction } from "@/libs/db-helpers";
+import { withTransaction } from "@/libs/db";
 import { auditLogger } from "@/services/audit-logger";
-import { GROUP_SERVICE_INFO, HTTP_STATUS } from "@/constants";
+import { COMPUTER_TYPES, ERROR_MESSAGES, GROUP_SERVICE_INFO, HTTP_STATUS, QUERY_PARAMS } from "@/constants";
 import { AssignComputerSchema, UnassignComputerSchema } from "@/validations";
 import type { RowDataPacket } from "mysql2";
 
@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 // GET - Liste des ordinateurs (avec option ?free=true pour les libres)
 export async function GET(req: NextRequest) {
   return withErrorHandler(async () => {
-    const free = req.nextUrl.searchParams.get("free") === "true";
+    const free = req.nextUrl.searchParams.get(QUERY_PARAMS.FREE) === QUERY_PARAMS.TRUE;
     
     if (free) {
       // Ordinateurs libres - réservé au service info
@@ -23,8 +23,9 @@ export async function GET(req: NextRequest) {
       const [rows] = await pool.execute<RowDataPacket[]>(
         `SELECT id, nom, systeme_exploitation, version, utilisateur_id, type
          FROM ordinateurs
-         WHERE type = 'Station' AND utilisateur_id IS NULL
-         ORDER BY nom`
+         WHERE type IN (?, ?) AND utilisateur_id IS NULL
+         ORDER BY nom`,
+        [COMPUTER_TYPES.STATION, COMPUTER_TYPES.PORTABLE]
       );
       return NextResponse.json(rows);
     }
@@ -56,20 +57,18 @@ export async function POST(req: NextRequest) {
       );
       const r = (rows as any[])[0];
       if (!r) {
-        return NextResponse.json({ error: "Ordinateur introuvable" }, { status: HTTP_STATUS.NOT_FOUND });
+        throw new ApiError(ERROR_MESSAGES.COMPUTER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
       }
-      if (r.type !== "Station") {
-        return NextResponse.json({ error: "Seules les Stations sont assignables" }, { status: HTTP_STATUS.BAD_REQUEST });
+      if (r.type !== COMPUTER_TYPES.STATION && r.type !== COMPUTER_TYPES.PORTABLE) {
+        throw new ApiError(ERROR_MESSAGES.ONLY_STATIONS_ASSIGNABLE, HTTP_STATUS.BAD_REQUEST);
       }
       if (r.utilisateur_id !== null) {
-        return NextResponse.json({ error: "Ordinateur déjà assigné" }, { status: HTTP_STATUS.CONFLICT });
+        throw new ApiError(ERROR_MESSAGES.COMPUTER_ALREADY_ASSIGNED, HTTP_STATUS.CONFLICT);
       }
 
       await conn.execute("UPDATE ordinateurs SET utilisateur_id = ? WHERE id = ?", [userId, ordId]);
       return { ...r, utilisateur_id: userId };
     });
-
-    if (ordinateur instanceof NextResponse) return ordinateur;
 
     auditLogger.logComputerAssign(auth.username, auth.ip, ordId, userId);
     return NextResponse.json({ ok: true, ordinateur }, { status: HTTP_STATUS.CREATED });
@@ -90,17 +89,15 @@ export async function DELETE(req: NextRequest) {
       );
       const r = (rows as any[])[0];
       if (!r) {
-        return NextResponse.json({ error: "Ordinateur introuvable" }, { status: HTTP_STATUS.NOT_FOUND });
+        throw new ApiError(ERROR_MESSAGES.COMPUTER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
       }
       if (r.utilisateur_id === null) {
-        return NextResponse.json({ error: "Ordinateur déjà libre" }, { status: HTTP_STATUS.CONFLICT });
+        throw new ApiError(ERROR_MESSAGES.COMPUTER_ALREADY_FREE, HTTP_STATUS.CONFLICT);
       }
 
       await conn.execute("UPDATE ordinateurs SET utilisateur_id = NULL WHERE id = ?", [ordId]);
       return { ok: true };
     });
-
-    if (result instanceof NextResponse) return result;
 
     auditLogger.logComputerUnassign(auth.username, auth.ip, ordId);
     return NextResponse.json(result);

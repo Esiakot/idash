@@ -11,15 +11,9 @@ export const GROUPS_AUTORISES = [
   "Glo_Direction",
   "Glo_Symetrie",
   "Administrateurs",
-] as const;
-
-/**
- * Groupes autorisés pour la section Marketing
- */
-export const GROUPS_AUTORISES_MARKETING = [
-  "Glo_ServiceInfo",
-  "Glo_Commercial",
-  "Glo_Direction",
+  "Glo_Comptabilite",
+  "Glo_Production",
+  "Glo_RH",
 ] as const;
 
 /**
@@ -49,11 +43,16 @@ export const DB_GROUP_COLUMNS = [
 export const API_ROUTES = {
   AUTH: "/api/auth",
   SESSION: "/api/session",
-  ANNUAIRE: "/api/si/annuaire",
-  ORDINATEURS: "/api/si/ordinateurs",
-  TELEPHONES: "/api/si/telephones",
-  UTILISATEUR_MOBILE: (id: number | string) => `/api/si/utilisateurs/${id}/mobile`,
+  ANNUAIRE: "/api/annuaire",
+  ORDINATEURS: "/api/ordinateurs",
+  ORDINATEURS_ANNUAIRE: "/api/ordinateurs/annuaire",
+  TELEPHONES: "/api/telephones",
+  UTILISATEUR_MOBILE: (id: number | string) => `/api/utilisateurs/${id}/mobile`,
 } as const;
+
+// ─── Tokens spéciaux ─────────────────────────────────────────
+
+export const NULL_TOKEN = "__NULL__";
 
 // ─── Événements Custom ───────────────────────────────────────
 
@@ -95,8 +94,23 @@ export const ERROR_MESSAGES = {
   NOT_FOUND: "Ressource non trouvée",
   INTERNAL_ERROR: "Erreur interne serveur",
   INVALID_DATA: "Données invalides",
+  INVALID_JSON: "Corps de la requête invalide (JSON attendu)",
   DUPLICATE_ENTRY: "Cette entrée existe déjà",
   REFERENCE_ERROR: "Référence invalide (utilisateur ou ressource inexistant)",
+  CREDENTIALS_REQUIRED: "Identifiants requis",
+  INVALID_CREDENTIALS: "Identifiants incorrects",
+  RATE_LIMITED: (seconds: number) => `Trop de tentatives. Réessayez dans ${seconds} secondes`,
+  COMPUTER_NOT_FOUND: "Ordinateur introuvable",
+  ONLY_STATIONS_ASSIGNABLE: "Seules les Stations sont assignables",
+  COMPUTER_ALREADY_ASSIGNED: "Ordinateur déjà assigné",
+  COMPUTER_ALREADY_FREE: "Ordinateur déjà libre",
+  PHONE_NOT_FOUND: "Téléphone non trouvé",
+  USER_NOT_FOUND: "Utilisateur non trouvé",
+  NETWORK_ERROR: "Erreur réseau",
+  ASSIGN_ERROR: "Erreur d'assignation",
+  CREATE_FAILED: "Création échouée",
+  UPDATE_FAILED: "Mise à jour échouée",
+  DELETE_FAILED: "Suppression échouée",
 } as const;
 
 // ─── Codes de statut HTTP ────────────────────────────────────
@@ -177,3 +191,76 @@ export const ANNUAIRE_CATEGORIES: Record<string, string[]> = {
     "Glo_RH",
   ],
 };
+
+// ─── Types d'ordinateur ──────────────────────────────────────
+
+export const COMPUTER_TYPES = {
+  STATION: "Station",
+  SERVEUR: "Serveur",
+  PORTABLE: "Portable",
+  AUTRE: "Autre",
+} as const;
+
+// ─── Types d'utilisateur ─────────────────────────────────────
+
+export const USER_TYPES = {
+  UTILISATEUR: "Utilisateur",
+  STAGIAIRE: "Stagiaire",
+  AUTRE: "Autre",
+} as const;
+
+// ─── Statuts d'activité ──────────────────────────────────────
+
+export const ACTIVITY_STATUS = {
+  ACTIF: "Actif",
+  INACTIF: "Inactif",
+} as const;
+
+// ─── Statuts d'affectation ordinateur ────────────────────────
+
+export const ASSIGNMENT_STATUS = {
+  TOUS: "Tous",
+  AFFECTE: "Affecté",
+  NON_AFFECTE: "Non affecté",
+} as const;
+
+// ─── Health Check statuts ────────────────────────────────────
+
+export const HEALTH_STATUS = {
+  OK: "ok",
+  ERROR: "error",
+  WARNING: "warning",
+  HEALTHY: "healthy",
+  UNHEALTHY: "unhealthy",
+  DEGRADED: "degraded",
+} as const;
+
+// ─── Ordinateurs: mapping tri SQL ────────────────────────────
+
+export const ORDINATEUR_SORT_MAP: Record<string, string> = {
+  nom: "o.nom",
+  type: "o.type",
+  os: "o.systeme_exploitation",
+  utilisateur: "u.prenom, u.nom",
+};
+
+// ─── Query params ────────────────────────────────────────────
+
+export const QUERY_PARAMS = {
+  FREE: "free",
+  TRUE: "true",
+} as const;
+
+// ─── Codes erreur MySQL ──────────────────────────────────────
+
+export const MYSQL_ERRORS = {
+  DUPLICATE_ENTRY: "ER_DUP_ENTRY",
+  REFERENCE_ERROR: "ER_NO_REFERENCED_ROW_2",
+} as const;
+
+// ─── Labels d'affichage ──────────────────────────────────────
+
+export const DISPLAY_LABELS = {
+  NON_SPECIFIE: "Non spécifié",
+  NON_AFFECTE: "Non affecté",
+} as const;

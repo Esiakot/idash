@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import type { SortDirection } from "@/types";
 
 export function useLocalStorageBool(key: string, defaultValue = true): [boolean, (v: boolean) => void] {
   const [value, setValue] = useState<boolean>(() => {
@@ -51,52 +52,31 @@ export function useLocalStorageJson<T>(key: string, defaultValue: T): [T, (v: T 
   return [value, setValue];
 }
 
-type SortDir = "asc" | "desc" | null;
-
-export function useLocalStorageSort(): {
+export function useLocalStorageSort(prefix = ""): {
   sortColumn: string | null;
   setSortColumn: (v: string | null) => void;
-  sortDirection: SortDir;
-  setSortDirection: (v: SortDir) => void;
+  sortDirection: SortDirection;
+  setSortDirection: (v: SortDirection) => void;
 } {
+  const colKey = prefix ? `${prefix}_sortColumn` : "sortColumn";
+  const dirKey = prefix ? `${prefix}_sortDirection` : "sortDirection";
+
   const [sortColumn, setSortColumn] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("sortColumn") || null;
+    return localStorage.getItem(colKey) || null;
   });
 
-  const [sortDirection, setSortDirection] = useState<SortDir>(() => {
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
     if (typeof window === "undefined") return null;
-    const v = localStorage.getItem("sortDirection");
+    const v = localStorage.getItem(dirKey);
     return v === "asc" || v === "desc" ? v : null;
   });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    localStorage.setItem("sortColumn", sortColumn ?? "");
-    localStorage.setItem("sortDirection", sortDirection ?? "");
-  }, [sortColumn, sortDirection]);
+    localStorage.setItem(colKey, sortColumn ?? "");
+    localStorage.setItem(dirKey, sortDirection ?? "");
+  }, [colKey, dirKey, sortColumn, sortDirection]);
 
   return { sortColumn, setSortColumn, sortDirection, setSortDirection };
-}
-
-export function useSortCycle() {
-  const [clickCount, setClickCount] = useState<Record<string, number>>({});
-  const { sortColumn, setSortColumn, sortDirection, setSortDirection } = useLocalStorageSort();
-
-  const handleHeaderClick = useCallback((col: string) => {
-    const count = ((clickCount[col] || 0) + 1) % 3;
-    setClickCount({ [col]: count });
-    if (count === 1) {
-      setSortColumn(col);
-      setSortDirection("asc");
-    } else if (count === 2) {
-      setSortColumn(col);
-      setSortDirection("desc");
-    } else {
-      setSortColumn(null);
-      setSortDirection(null);
-    }
-  }, [clickCount, setSortColumn, setSortDirection]);
-
-  return { sortColumn, sortDirection, handleHeaderClick };
 }

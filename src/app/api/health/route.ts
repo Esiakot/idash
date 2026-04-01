@@ -1,7 +1,7 @@
 // src/app/api/health/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "@/libs/db";
-import { REQUIRED_ENV_VARS, HTTP_STATUS } from "@/constants";
+import { REQUIRED_ENV_VARS, HTTP_STATUS, HEALTH_STATUS } from "@/constants";
 
 export const runtime = "nodejs";
 
@@ -17,20 +17,20 @@ export async function GET(req: NextRequest) {
   try {
     const pool = getPool();
     await pool.execute("SELECT 1 as health");
-    checks.database = { status: "ok" };
+    checks.database = { status: HEALTH_STATUS.OK };
   } catch {
-    checks.database = { status: "error" };
+    checks.database = { status: HEALTH_STATUS.ERROR };
   }
 
   // 2. Vérifier les variables d'environnement critiques
   const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
-  checks.environment = { status: missingVars.length > 0 ? "warning" : "ok" };
+  checks.environment = { status: missingVars.length > 0 ? HEALTH_STATUS.WARNING : HEALTH_STATUS.OK };
 
   // Déterminer le statut global
-  const allOk = Object.values(checks).every((c) => c.status === "ok");
-  const hasErrors = Object.values(checks).some((c) => c.status === "error");
+  const allOk = Object.values(checks).every((c) => c.status === HEALTH_STATUS.OK);
+  const hasErrors = Object.values(checks).some((c) => c.status === HEALTH_STATUS.ERROR);
 
-  const status = hasErrors ? "unhealthy" : allOk ? "healthy" : "degraded";
+  const status = hasErrors ? HEALTH_STATUS.UNHEALTHY : allOk ? HEALTH_STATUS.HEALTHY : HEALTH_STATUS.DEGRADED;
   const httpStatus = hasErrors ? HTTP_STATUS.SERVICE_UNAVAILABLE : HTTP_STATUS.OK;
 
   return NextResponse.json(

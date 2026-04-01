@@ -3,8 +3,6 @@
 import styles from "@/styles/si/shared.module.css";
 import type { Telephone } from "@/types";
 
-export type { Telephone };
-
 export default function UserPhones({
   tels,
   fixedWidth = true,

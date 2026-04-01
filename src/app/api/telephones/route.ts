@@ -3,9 +3,9 @@ import { getPool } from "@/libs/db";
 import { requireAnyGroup, requireGroup } from "@/middleware/auth-middleware";
 import { withErrorHandler } from "@/libs/api-wrapper";
 import { validateRequest } from "@/utils/request-helpers";
-import { withTransaction } from "@/libs/db-helpers";
+import { withTransaction } from "@/libs/db";
 import { auditLogger } from "@/services/audit-logger";
-import { GROUPS_AUTORISES, GROUP_SERVICE_INFO, HTTP_STATUS } from "@/constants";
+import { ERROR_MESSAGES, GROUPS_AUTORISES, GROUP_SERVICE_INFO, HTTP_STATUS } from "@/constants";
 import { CreateTelephoneSchema, UpdateTelephoneSchema, DeleteTelephoneSchema } from "@/validations";
 import type { RowDataPacket } from "mysql2";
 
@@ -68,7 +68,7 @@ export async function PUT(req: NextRequest) {
     });
 
     if (affectedRows === 0) {
-      return NextResponse.json({ error: "Téléphone non trouvé" }, { status: HTTP_STATUS.NOT_FOUND });
+      return NextResponse.json({ error: ERROR_MESSAGES.PHONE_NOT_FOUND }, { status: HTTP_STATUS.NOT_FOUND });
     }
 
     auditLogger.logTelephoneUpdate(auth.username, auth.ip, telId, { poste });
@@ -90,7 +90,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (affectedRows === 0) {
-      return NextResponse.json({ error: "Téléphone non trouvé" }, { status: HTTP_STATUS.NOT_FOUND });
+      return NextResponse.json({ error: ERROR_MESSAGES.PHONE_NOT_FOUND }, { status: HTTP_STATUS.NOT_FOUND });
     }
 
     auditLogger.logTelephoneDelete(auth.username, auth.ip, telId);

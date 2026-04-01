@@ -5,6 +5,18 @@ import { ApiError } from "@/libs/api-wrapper";
 import { HTTP_STATUS, ERROR_MESSAGES } from "@/constants";
 
 /**
+ * Valide et extrait un paramètre ID numérique depuis les params d'une route dynamique.
+ * @throws ApiError si l'ID est invalide
+ */
+export function parseRouteId(params: { id: string }, label = "ID"): number {
+  const id = Number(params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new ApiError(`${label} invalide`, HTTP_STATUS.BAD_REQUEST);
+  }
+  return id;
+}
+
+/**
  * Valide le body d'une requête avec un schéma Zod
  * Lance une ApiError si la validation échoue ou si le JSON est invalide
  */
@@ -17,7 +29,7 @@ export async function validateRequest<T>(
     body = await req.json();
   } catch {
     throw new ApiError(
-      "Corps de la requête invalide (JSON attendu)",
+      ERROR_MESSAGES.INVALID_JSON,
       HTTP_STATUS.BAD_REQUEST
     );
   }

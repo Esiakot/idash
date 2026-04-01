@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import styles from "@/styles/si/shared.module.css";
 import ExportPdfButton from "@/components/si/annuaire/ExportPdfButton";
 import FiltersSidebar from "@/components/si/annuaire/FiltersSidebar";
@@ -9,11 +8,7 @@ import AnnuaireTable from "@/components/si/annuaire/AnnuaireTable";
 import AssignPcModal from "@/components/si/annuaire/AssignPcModal";
 import PhonesEditorModal from "@/components/si/annuaire/PhonesEditorModal";
 import MobileEditorModal from "@/components/si/annuaire/MobileEditorModal";
-import type { Ordinateur, Telephone, Utilisateur } from "@/types";
-import { flagOn } from "@/utils/formatters";
-import { useAnnuaireData } from "@/hooks/useAnnuaireData";
-import type { ComputersByUserId } from "@/hooks/useAnnuaireData";
-import { useAnnuaireFilters } from "@/hooks/useAnnuaireFilters";
+import { useAnnuaireData, useAnnuaireFilters, useAnnuaireActions } from "@/hooks/useAnnuaire";
 
 export default function Page() {
   const {
@@ -55,81 +50,30 @@ export default function Page() {
     setQuery,
   } = useAnnuaireFilters(users, computersByUserId, phonesByUserId);
 
-  // --- Assign PC modal ---
-  const [assignOpen, setAssignOpen] = useState(false);
-  const [assignUserId, setAssignUserId] = useState<number | null>(null);
-  const [assignUserLabel, setAssignUserLabel] = useState<string | undefined>(undefined);
-
-  const openAssignFor = (user: Utilisateur) => {
-    if (!isServiceInfo) return;
-    setAssignUserId(user.id);
-    setAssignUserLabel(`${user.nom} ${user.prenom}`.trim());
-    setAssignOpen(true);
-  };
-
-  const onAssigned = (pc: Ordinateur) => {
-    if (!assignUserId) return;
-    setComputersByUserId((prev) => {
-      const next: ComputersByUserId = {};
-      for (const k of Object.keys(prev)) {
-        const uid = Number(k);
-        next[uid] = (prev[uid] || []).filter((p) => p.id !== pc.id);
-      }
-      next[assignUserId] = [
-        ...(next[assignUserId] || []),
-        { ...pc, utilisateur_id: assignUserId },
-      ];
-      return next;
-    });
-  };
-
-  const unassignPc = async (pcId: number, userId: number) => {
-    if (!isServiceInfo) return;
-    const ok = confirm("Désassigner ce PC ?");
-    if (!ok) return;
-    const res = await fetch("/api/si/ordinateurs", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ordinateur_id: pcId }),
-    });
-    if (res.ok) {
-      setComputersByUserId((prev) => {
-        const next = { ...prev };
-        next[userId] = (next[userId] || []).filter((p) => p.id !== pcId);
-        return next;
-      });
-    } else {
-      const msg = (await res.json())?.error || "Impossible de désassigner.";
-      alert(msg);
-    }
-  };
-
-  // --- Phone / Mobile editors ---
-  const [phonesEditorOpen, setPhonesEditorOpen] = useState(false);
-  const [phonesEditorUser, setPhonesEditorUser] = useState<Utilisateur | null>(null);
-  const [mobileEditorOpen, setMobileEditorOpen] = useState(false);
-  const [mobileEditorUser, setMobileEditorUser] = useState<Utilisateur | null>(null);
-
-  const openPhonesEditor = (user: Utilisateur) => {
-    if (!isServiceInfo) return;
-    setPhonesEditorUser(user);
-    setPhonesEditorOpen(true);
-  };
-  const openMobileEditor = (user: Utilisateur) => {
-    if (!isServiceInfo) return;
-    setMobileEditorUser(user);
-    setMobileEditorOpen(true);
-  };
-
-  const onPhonesSaved = (userId: number, next: Telephone[]) => {
-    setPhonesByUserId((prev) => ({ ...prev, [userId]: next }));
-  };
-
-  const onMobileSaved = (userId: number, newMobile: string) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, mobiles: newMobile } : u)),
-    );
-  };
+  const {
+    assignOpen,
+    assignUserId,
+    assignUserLabel,
+    openAssignFor,
+    closeAssign,
+    onAssigned,
+    unassignPc,
+    phonesEditorOpen,
+    phonesEditorUser,
+    openPhonesEditor,
+    closePhonesEditor,
+    onPhonesSaved,
+    mobileEditorOpen,
+    mobileEditorUser,
+    openMobileEditor,
+    closeMobileEditor,
+    onMobileSaved,
+  } = useAnnuaireActions({
+    isServiceInfo,
+    setComputersByUserId,
+    setPhonesByUserId,
+    setUsers,
+  });
 
   if (loading) return <p className={styles.loading}>Chargement...</p>;
   if (error) return <p className={styles.error}>Erreur : {error}</p>;
@@ -180,7 +124,6 @@ export default function Page() {
           onHeaderClick={handleHeaderClick}
           hoveredGroup={hoveredGroup}
           setHoveredGroup={setHoveredGroup}
-          flagOn={flagOn}
           computersByUserId={computersByUserId}
           phonesByUserId={phonesByUserId}
           isServiceInfo={isServiceInfo}
@@ -195,7 +138,7 @@ export default function Page() {
         open={assignOpen}
         userId={assignUserId}
         userLabel={assignUserLabel}
-        onClose={() => setAssignOpen(false)}
+        onClose={closeAssign}
         onAssigned={onAssigned}
       />
 
@@ -212,10 +155,8 @@ export default function Page() {
             : null
         }
         tels={phonesByUserId[phonesEditorUser?.id ?? -1] ?? []}
-        onClose={() => setPhonesEditorOpen(false)}
-        onSaved={(next) => {
-          if (phonesEditorUser) onPhonesSaved(phonesEditorUser.id, next);
-        }}
+        onClose={closePhonesEditor}
+        onSaved={onPhonesSaved}
       />
 
       <MobileEditorModal
@@ -228,10 +169,8 @@ export default function Page() {
             : undefined
         }
         currentMobile={mobileEditorUser?.mobiles ?? ""}
-        onClose={() => setMobileEditorOpen(false)}
-        onSaved={(newMobile) => {
-          if (mobileEditorUser) onMobileSaved(mobileEditorUser.id, newMobile);
-        }}
+        onClose={closeMobileEditor}
+        onSaved={onMobileSaved}
       />
     </div>
   );

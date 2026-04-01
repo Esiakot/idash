@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import styles from "@/styles/si/shared.module.css";
 import type { Telephone, UserLite } from "@/types";
-import { API_ROUTES } from "@/constants";
-import { formatPhone } from "@/utils/phone-formatter";
+import { API_ROUTES, ERROR_MESSAGES } from "@/constants";
+import { formatPhone } from "@/utils/formatters";
 
 type Props = {
   open: boolean;
@@ -62,7 +62,7 @@ export default function PhonesEditorModal({
         }),
       });
       const j = await res.json();
-      if (!res.ok) throw new Error(j?.error || "Création échouée");
+      if (!res.ok) throw new Error(j?.error || ERROR_MESSAGES.CREATE_FAILED);
       const created: Telephone = j.telephone;
       const next = [...rows, created].sort((a, b) =>
         a.poste.localeCompare(b.poste)
@@ -72,7 +72,7 @@ export default function PhonesEditorModal({
       setNewPoste("");
       setNewFixe("");
     } catch (e: any) {
-      setErr(e?.message || "Erreur réseau");
+      setErr(e?.message || ERROR_MESSAGES.NETWORK_ERROR);
     } finally {
       setLoading(false);
     }
@@ -98,14 +98,14 @@ export default function PhonesEditorModal({
         body: JSON.stringify({ id: row.id, poste, lignes_internes: lignes }),
       });
       const j = await res.json();
-      if (!res.ok) throw new Error(j?.error || "Mise à jour échouée");
+      if (!res.ok) throw new Error(j?.error || ERROR_MESSAGES.UPDATE_FAILED);
       const next = rows.map((r) =>
         r.id === row.id ? { ...row, poste, lignes_internes: lignes } : r
       );
       setRows(next);
       onSaved(next);
     } catch (e: any) {
-      setErr(e?.message || "Erreur réseau");
+      setErr(e?.message || ERROR_MESSAGES.NETWORK_ERROR);
     } finally {
       setLoading(false);
     }
@@ -122,12 +122,12 @@ export default function PhonesEditorModal({
         body: JSON.stringify({ id: rowId }),
       });
       const j = await res.json();
-      if (!res.ok) throw new Error(j?.error || "Suppression échouée");
+      if (!res.ok) throw new Error(j?.error || ERROR_MESSAGES.DELETE_FAILED);
       const next = rows.filter((r) => r.id !== rowId);
       setRows(next);
       onSaved(next);
     } catch (e: any) {
-      setErr(e?.message || "Erreur réseau");
+      setErr(e?.message || ERROR_MESSAGES.NETWORK_ERROR);
     } finally {
       setLoading(false);
     }
@@ -243,9 +243,7 @@ function FragmentRow({
         className={styles.input}
         value={row.lignes_internes}
         onChange={(e) => {
-          const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
-          const formatted = digits.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
-          onChange({ ...row, lignes_internes: formatted });
+          onChange({ ...row, lignes_internes: formatPhone(e.target.value) });
         }}
         maxLength={14}
       />

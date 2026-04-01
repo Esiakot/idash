@@ -1,24 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireGroup } from "@/middleware/auth-middleware";
-import { withErrorHandler, ApiError } from "@/libs/api-wrapper";
-import { validateRequest } from "@/utils/request-helpers";
-import { withTransaction } from "@/libs/db-helpers";
+import { withErrorHandler } from "@/libs/api-wrapper";
+import { validateRequest, parseRouteId } from "@/utils/request-helpers";
+import { withTransaction } from "@/libs/db";
 import { auditLogger } from "@/services/audit-logger";
-import { GROUP_SERVICE_INFO, HTTP_STATUS } from "@/constants";
+import { ERROR_MESSAGES, GROUP_SERVICE_INFO, HTTP_STATUS } from "@/constants";
 import { UpdateMobileSchema } from "@/validations";
 
 export const runtime = "nodejs";
-
-/**
- * Valide et extrait le paramètre id depuis l'URL
- */
-function parseUserId(params: { id: string }): number {
-  const id = Number(params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    throw new ApiError("ID utilisateur invalide", HTTP_STATUS.BAD_REQUEST);
-  }
-  return id;
-}
 
 // GET - Récupérer le numéro mobile d'un utilisateur
 export async function GET(
@@ -27,7 +16,7 @@ export async function GET(
 ) {
   return withErrorHandler(async () => {
     const params = "then" in context.params ? await context.params : context.params;
-    const userId = parseUserId(params);
+    const userId = parseRouteId(params, "ID utilisateur");
 
     requireGroup(req, GROUP_SERVICE_INFO);
 
@@ -50,7 +39,7 @@ export async function PATCH(
 ) {
   return withErrorHandler(async () => {
     const params = "then" in context.params ? await context.params : context.params;
-    const userId = parseUserId(params);
+    const userId = parseRouteId(params, "ID utilisateur");
 
     const auth = requireGroup(req, GROUP_SERVICE_INFO);
 
@@ -66,7 +55,7 @@ export async function PATCH(
 
     if (affectedRows === 0) {
       return NextResponse.json(
-        { error: "Utilisateur non trouvé" },
+        { error: ERROR_MESSAGES.USER_NOT_FOUND },
         { status: HTTP_STATUS.NOT_FOUND }
       );
     }

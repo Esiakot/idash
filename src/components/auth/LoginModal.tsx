@@ -3,7 +3,7 @@
 import styles from "@/styles/si/shared.module.css";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { API_ROUTES } from "@/constants";
+import { API_ROUTES, ERROR_MESSAGES } from "@/constants";
 
 interface Props {
   onClose: () => void;
@@ -36,7 +36,7 @@ const LoginModal = ({ onClose, onLoginSuccess }: Props) => {
       onLoginSuccess(data.username);
       onClose();
     } else {
-      setError(data.error || data.message || "Identifiants incorrects");
+      setError(data.error || data.message || ERROR_MESSAGES.INVALID_CREDENTIALS);
     }
   };
 

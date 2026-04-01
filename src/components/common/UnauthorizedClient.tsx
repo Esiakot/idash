@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { API_ROUTES, EVENTS } from "@/constants";
 
@@ -14,7 +14,7 @@ export default function UnauthorizedClient() {
   // Vérifie la session
   useEffect(() => {
     fetch(API_ROUTES.SESSION).then((res) => {
-      if (res.status === 200) {
+      if (res.ok) {
         setTimeout(() => setShouldRedirect(true), 500);
       }
     });
@@ -26,8 +26,7 @@ export default function UnauthorizedClient() {
   }, [shouldRedirect, redirect, router]);
 
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+    <div style={{ padding: "2rem", textAlign: "center" }}>
         <h1>⛔ Accès refusé</h1>
         <p>Vous n’avez pas les droits pour accéder à cette section.</p>
         <p>
@@ -46,7 +45,6 @@ export default function UnauthorizedClient() {
         >
           🔐 Se reconnecter
         </button>
-      </div>
-    </Suspense>
+    </div>
   );
 }

@@ -35,13 +35,12 @@ class AuditLogger {
    */
   logAuthSuccess(username: string, ip: string, groups: string[]): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "AUTH_SUCCESS",
       username,
       ip,
       details: { groups },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -49,13 +48,12 @@ class AuditLogger {
    */
   logAuthFailed(username: string, ip: string, reason?: string): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "AUTH_FAILED",
       username,
       ip,
       details: { reason },
       success: false,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -63,12 +61,11 @@ class AuditLogger {
    */
   logRateLimited(ip: string, endpoint: string): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "AUTH_RATE_LIMITED",
       ip,
       details: { endpoint },
       success: false,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -81,13 +78,12 @@ class AuditLogger {
     details: { poste: string; utilisateur_id: number }
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "TELEPHONE_CREATE",
       username,
       ip,
       details: { telephoneId, ...details },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -100,13 +96,12 @@ class AuditLogger {
     details: { poste: string }
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "TELEPHONE_UPDATE",
       username,
       ip,
       details: { telephoneId, ...details },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -118,13 +113,12 @@ class AuditLogger {
     telephoneId: number
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "TELEPHONE_DELETE",
       username,
       ip,
       details: { telephoneId },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -137,13 +131,12 @@ class AuditLogger {
     userId: number
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "COMPUTER_ASSIGN",
       username,
       ip,
       details: { computerId, userId },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -155,13 +148,12 @@ class AuditLogger {
     computerId: number
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "COMPUTER_UNASSIGN",
       username,
       ip,
       details: { computerId },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -174,13 +166,12 @@ class AuditLogger {
     newMobile: string
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "USER_MOBILE_UPDATE",
       username,
       ip,
       details: { userId, newMobile },
       success: true,
-    });
+    } as AuditLog);
   }
 
   /**
@@ -193,13 +184,12 @@ class AuditLogger {
     requiredGroup?: string
   ): void {
     this.log({
-      timestamp: new Date().toISOString(),
       action: "UNAUTHORIZED_ACCESS",
       username,
       ip,
       details: { endpoint, requiredGroup },
       success: false,
-    });
+    } as AuditLog);
   }
 }
 

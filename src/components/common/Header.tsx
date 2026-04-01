@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import LoginModal from "@/components/auth/LoginModal";
 import { useRouter, useSearchParams } from "next/navigation";
-import { GROUPS_AUTORISES_MARKETING, API_ROUTES, EVENTS } from "@/constants";
+import { API_ROUTES, EVENTS } from "@/constants";
 
 const Header = () => {
   const [username, setUsername] = useState<string | null>(null);
@@ -62,11 +62,6 @@ const Header = () => {
     }
   }, [checkSession, searchParams, router]);
 
-  // Filtrage sécurisé des groupes pour éviter undefined ou types incorrects
-  const safeGroups = groups.filter(
-    (g: unknown): g is string => typeof g === "string"
-  );
-
   return (
     <>
       {showLogin && (
@@ -84,15 +79,6 @@ const Header = () => {
 
         <nav className={styles.nav}>
           <Link href="/">Accueil</Link>
-          {/* <Link href="/rh">RH</Link> */}
-          {/* <Link href="/adm">ADM</Link>
-
-          {safeGroups.some((g) => GROUPS_AUTORISES_MARKETING.includes(g)) && (
-            <Link href="/marketing">Marketing</Link>
-          )}
-
-          <Link href="/achatprod">Achat/Prod</Link>
-          <Link href="/magasin">Magasin</Link> */}
 
           {username ? (
             <div className={styles.userContainer}>

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "@/styles/si/shared.module.css";
 import type { Ordinateur } from "@/types";
-import { API_ROUTES } from "@/constants";
+import { API_ROUTES, ERROR_MESSAGES, QUERY_PARAMS } from "@/constants";
 
 type Props = {
   open: boolean;
@@ -30,7 +30,7 @@ export default function AssignPcModal({
     if (!open) return;
     setLoading(true);
     setError(null);
-    fetch(`${API_ROUTES.ORDINATEURS}?free=true`)
+    fetch(`${API_ROUTES.ORDINATEURS}?${QUERY_PARAMS.FREE}=${QUERY_PARAMS.TRUE}`)
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data)) setPcs(data);
@@ -60,7 +60,7 @@ export default function AssignPcModal({
         }),
       });
       if (!res.ok) {
-        const msg = (await res.json())?.error || "Erreur d’assignation";
+        const msg = (await res.json())?.error || ERROR_MESSAGES.ASSIGN_ERROR;
         setError(msg);
       } else {
         const pc = pcs.find((p) => p.id === selected);
@@ -68,7 +68,7 @@ export default function AssignPcModal({
         onClose();
       }
     } catch (e: any) {
-      setError(e?.message || "Erreur réseau");
+      setError(e?.message || ERROR_MESSAGES.NETWORK_ERROR);
     } finally {
       setLoading(false);
     }

@@ -2,17 +2,9 @@
 import { NextRequest } from "next/server";
 import { ApiError } from "@/libs/api-wrapper";
 import { unsignCookie } from "@/libs/cookie-signer";
-import { ERROR_MESSAGES, HTTP_STATUS } from "@/constants";
+import { COOKIE_CONFIG, ERROR_MESSAGES, HTTP_STATUS } from "@/constants";
+import type { AuthContext } from "@/types";
 import { getClientIp } from "./rate-limiter";
-
-/**
- * Contexte d'authentification enrichi
- */
-export interface AuthContext {
-  username: string;
-  groups: string[];
-  ip: string;
-}
 
 /**
  * Parse les cookies d'une requête
@@ -32,25 +24,18 @@ function parseCookies(req: NextRequest | Request): Record<string, string> {
 }
 
 /**
- * Vérifie l'authentification d'un utilisateur via les cookies signés
- * @param req - La requête Next.js
- * @returns Les informations d'authentification (username, groupes, IP)
- * @throws ApiError si l'utilisateur n'est pas authentifié ou si la signature est invalide
+ * Extrait et vérifie les cookies d'authentification signés.
+ * Utilisé par requireAuth et le endpoint session.
  */
-export function requireAuth(req: NextRequest | Request): AuthContext {
+export function parseSessionFromCookies(req: NextRequest | Request): {
+  username: string | null;
+  groups: string[];
+} {
   const cookies = parseCookies(req);
-  const rawToken = cookies["auth_token"];
-  const rawGroups = cookies["auth_groups"];
+  const rawToken = cookies[COOKIE_CONFIG.AUTH_TOKEN];
+  const rawGroups = cookies[COOKIE_CONFIG.AUTH_GROUPS];
 
-  if (!rawToken) {
-    throw new ApiError(ERROR_MESSAGES.UNAUTHORIZED, HTTP_STATUS.UNAUTHORIZED);
-  }
-
-  // Vérifier la signature HMAC du cookie
-  const username = unsignCookie(rawToken);
-  if (!username) {
-    throw new ApiError(ERROR_MESSAGES.UNAUTHORIZED, HTTP_STATUS.UNAUTHORIZED);
-  }
+  const username = rawToken ? unsignCookie(rawToken) : null;
 
   let groups: string[] = [];
   if (rawGroups) {
@@ -65,6 +50,22 @@ export function requireAuth(req: NextRequest | Request): AuthContext {
         groups = [];
       }
     }
+  }
+
+  return { username, groups };
+}
+
+/**
+ * Vérifie l'authentification d'un utilisateur via les cookies signés
+ * @param req - La requête Next.js
+ * @returns Les informations d'authentification (username, groupes, IP)
+ * @throws ApiError si l'utilisateur n'est pas authentifié ou si la signature est invalide
+ */
+export function requireAuth(req: NextRequest | Request): AuthContext {
+  const { username, groups } = parseSessionFromCookies(req);
+
+  if (!username) {
+    throw new ApiError(ERROR_MESSAGES.UNAUTHORIZED, HTTP_STATUS.UNAUTHORIZED);
   }
 
   const ip = getClientIp(req.headers);

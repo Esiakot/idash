@@ -4,19 +4,10 @@ import { requireAuth } from "@/middleware/auth-middleware";
 import { withErrorHandler } from "@/libs/api-wrapper";
 import { validateQueryParams } from "@/utils/request-helpers";
 import { OrdinateursAnnuaireQuerySchema } from "@/validations";
-import { HTTP_STATUS } from "@/constants";
+import { ASSIGNMENT_STATUS, COMPUTER_TYPES, HTTP_STATUS, NULL_TOKEN, ORDINATEUR_SORT_MAP } from "@/constants";
 import type { TypeRow, OSRow, CountRow, ComputerRow } from "@/types";
 
 export const runtime = "nodejs";
-
-const SORT_MAP: Record<string, string> = {
-  nom: "o.nom",
-  type: "o.type",
-  os: "o.systeme_exploitation",
-  utilisateur: "u.prenom, u.nom",
-};
-
-const NULL_TOKEN = "__NULL__";
 
 // GET - Liste des ordinateurs avec facettes et filtres
 export async function GET(req: NextRequest) {
@@ -27,7 +18,7 @@ export async function GET(req: NextRequest) {
     const queryParams = validateQueryParams(url, OrdinateursAnnuaireQuerySchema);
 
     const type = queryParams.type ?? "";
-    const status = queryParams.status ?? "Tous";
+    const status = queryParams.status ?? ASSIGNMENT_STATUS.TOUS;
     const os = queryParams.os ?? "";
     const sortBy = queryParams.sortBy;
     const sortDir = queryParams.sortDir.toUpperCase() as "ASC" | "DESC";
@@ -51,8 +42,8 @@ export async function GET(req: NextRequest) {
       params.push(type);
     }
 
-    if (status === "Affecté") whereClauses.push("o.utilisateur_id IS NOT NULL");
-    else if (status === "Non affecté")
+    if (status === ASSIGNMENT_STATUS.AFFECTE) whereClauses.push("o.utilisateur_id IS NOT NULL");
+    else if (status === ASSIGNMENT_STATUS.NON_AFFECTE)
       whereClauses.push("o.utilisateur_id IS NULL");
 
     if (os) {
@@ -67,7 +58,7 @@ export async function GET(req: NextRequest) {
     const whereSql = whereClauses.length
       ? `WHERE ${whereClauses.join(" AND ")}`
       : "";
-    const orderCol = SORT_MAP[sortBy] ?? "o.nom";
+    const orderCol = ORDINATEUR_SORT_MAP[sortBy] ?? "o.nom";
     const orderSql = `ORDER BY ${orderCol} ${sortDir}`;
 
     const sql = `${baseSelect} ${whereSql} ${orderSql}`;
@@ -86,10 +77,11 @@ export async function GET(req: NextRequest) {
         `SELECT
            COUNT(*) AS total,
            SUM(utilisateur_id IS NOT NULL) AS assigned,
-           SUM(type = 'Station') AS station,
-           SUM(type = 'Serveur') AS serveur,
-           SUM(type NOT IN ('Station','Serveur')) AS other
-         FROM ordinateurs`
+           SUM(type = ?) AS station,
+           SUM(type = ?) AS serveur,
+           SUM(type NOT IN (?, ?)) AS other
+         FROM ordinateurs`,
+        [COMPUTER_TYPES.STATION, COMPUTER_TYPES.SERVEUR, COMPUTER_TYPES.STATION, COMPUTER_TYPES.SERVEUR]
       ),
     ]);
 

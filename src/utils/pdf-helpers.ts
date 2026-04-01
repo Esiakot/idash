@@ -1,36 +1,7 @@
 /**
  * Helpers dédiés à l'export PDF de l'annuaire.
- *
- * Les types sont volontairement plus souples que les types partagés (@/types)
- * afin de gérer les formats hétérogènes renvoyés par l'API (champs optionnels,
- * noms de colonnes alternatifs, données déjà stringifiées, etc.).
  */
-
-// ———————————— Types PDF (souples) ————————————
-
-export type PdfTelephone = {
-  id?: number | string;
-  poste?: string | number | null;
-  lignes_internes?: string | null;
-  fixe?: string | null;
-  ligne_fixe?: string | null;
-  utilisateur_id?: number | string | null;
-  [k: string]: any;
-};
-
-export type PdfUtilisateur = {
-  id: number | string;
-  trigramme: string;
-  prenom: string;
-  nom: string;
-  mobiles?: string;
-  telephones?: string | PdfTelephone[];
-  poste?: string | number | null;
-  lignes_internes?: string | null;
-  fixe?: string | null;
-  ligne_fixe?: string | null;
-  [key: string]: any;
-};
+import type { PdfTelephone, PdfUtilisateur } from "@/types";
 
 // ———————————— Helpers ————————————
 
@@ -43,18 +14,6 @@ export function normFixeFromObj(anyObj: Record<string, any> = {}): string {
     anyObj["telephone_fixe"] ??
     ""
   );
-}
-
-export function labelTel(t: PdfTelephone): string {
-  const poste = t.poste ? `Poste ${String(t.poste)}` : "";
-  const fixeVal = normFixeFromObj(t);
-  const fixe = fixeVal ? `Fixe ${fixeVal}` : "";
-  if (poste && fixe) return `${poste} — ${fixe}`;
-  return poste || fixe || "";
-}
-
-export function joinLabels(arr: PdfTelephone[]): string {
-  return arr.map(labelTel).filter(Boolean).join(", ");
 }
 
 function findByUtilisateurId(

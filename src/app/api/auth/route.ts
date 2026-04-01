@@ -5,10 +5,9 @@ import { authRateLimiter, getClientIp } from "@/middleware/rate-limiter";
 import { auditLogger } from "@/services/audit-logger";
 import { withErrorHandler, ApiError } from "@/libs/api-wrapper";
 import { signCookie } from "@/libs/cookie-signer";
-import { COOKIE_CONFIG, DB_GROUP_COLUMNS, HTTP_STATUS } from "@/constants";
+import { API_ROUTES, COOKIE_CONFIG, DB_GROUP_COLUMNS, ERROR_MESSAGES, HTTP_STATUS, USER_COLUMNS_NO_PASSWORD } from "@/constants";
 import { getPool } from "@/libs/db";
 import { AuthSchema } from "@/validations";
-import { USER_COLUMNS_NO_PASSWORD } from "@/constants";
 import { flagOn } from "@/utils/formatters";
 import type { RowDataPacket } from "mysql2";
 
@@ -20,9 +19,9 @@ export async function POST(req: NextRequest) {
     const clientIp = getClientIp(req.headers);
     if (!authRateLimiter.check(clientIp)) {
       const retryAfter = authRateLimiter.getTimeUntilReset(clientIp);
-      auditLogger.logRateLimited(clientIp, "/api/auth");
+      auditLogger.logRateLimited(clientIp, API_ROUTES.AUTH);
       throw new ApiError(
-        "Trop de tentatives. Réessayez dans " + retryAfter + " secondes",
+        ERROR_MESSAGES.RATE_LIMITED(retryAfter),
         HTTP_STATUS.TOO_MANY_REQUESTS
       );
     }
@@ -30,7 +29,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);
     const parsed = AuthSchema.safeParse(body);
     if (!parsed.success) {
-      throw new ApiError("Identifiants requis", HTTP_STATUS.BAD_REQUEST);
+      throw new ApiError(ERROR_MESSAGES.CREDENTIALS_REQUIRED, HTTP_STATUS.BAD_REQUEST);
     }
     const { username, password } = parsed.data;
 
@@ -44,13 +43,13 @@ export async function POST(req: NextRequest) {
     if (!dbUser || !dbUser.mot_de_passe) {
       // Message générique pour ne pas révéler l'existence d'un utilisateur
       auditLogger.logAuthFailed(username, clientIp, "User not found or no password");
-      throw new ApiError("Identifiants incorrects", HTTP_STATUS.UNAUTHORIZED);
+      throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
     }
 
     const isMatch = await bcrypt.compare(password, dbUser.mot_de_passe);
     if (!isMatch) {
       auditLogger.logAuthFailed(username, clientIp, "Invalid password");
-      throw new ApiError("Identifiants incorrects", HTTP_STATUS.UNAUTHORIZED);
+      throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
     }
 
     // Récupération des groupes à partir des colonnes de la DB

@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "@/styles/si/shared.module.css";
-import type { PdfUtilisateur, PdfTelephone } from "@/utils/pdf-helpers";
+import type { PdfUtilisateur, PdfTelephone } from "@/types";
 import {
   resolveTelephonesList,
   stringifyPostes,

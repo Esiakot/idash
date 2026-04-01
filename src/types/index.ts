@@ -70,67 +70,56 @@ export interface UserLite {
 
 export type SortDirection = "asc" | "desc" | null;
 
-/**
- * Entrée de l'annuaire (utilisateur avec ses relations)
- */
-export interface AnnuaireEntry extends Utilisateur {
-  telephones?: Telephone[];
-  ordinateurs?: Ordinateur[];
-}
-
 // ─── Types Authentification ──────────────────────────────────
 
 /**
- * Résultat d'authentification
+ * Session côté client (réponse de /api/session)
  */
-export interface AuthResult {
-  success: boolean;
+export interface ClientSession {
+  authenticated: boolean;
   username?: string;
-  groupes?: string[];
-  message?: string;
+  groups?: string[];
+}
+
+// ─── Types page Ordinateurs ─────────────────────────────────
+
+/**
+ * Ordinateur enrichi avec les infos utilisateur (vue table)
+ */
+export interface OrdinateurWithUser extends Ordinateur {
+  prenom?: string | null;
+  nom_utilisateur?: string | null;
+  activite?: number | null;
 }
 
 /**
- * Session utilisateur
+ * Facettes pour les filtres de la page ordinateurs
  */
-export interface UserSession {
-  username: string;
-  groups: string[];
-}
-
-// ─── Types API ───────────────────────────────────────────────
-
-/**
- * Réponse API générique
- */
-export interface ApiResponse<T = any> {
-  ok: boolean;
-  data?: T;
-  error?: string;
-  details?: any;
+export interface OrdinateurFacets {
+  types: string[];
+  osList: (string | null)[];
+  stats: {
+    total: number;
+    assigned: number;
+    nonAssigned: number;
+    station: number;
+    serveur: number;
+    other: number;
+  };
 }
 
 /**
- * Filtre pour l'annuaire
+ * Réponse API du endpoint /api/ordinateurs/annuaire
  */
-export interface AnnuaireFilters {
-  search?: string;
-  service?: string;
-  actif?: boolean;
-  page?: number;
-  limit?: number;
+export interface OrdinateursApiResponse {
+  computers: OrdinateurWithUser[];
+  facets: OrdinateurFacets;
 }
 
 /**
- * Statistiques du dashboard
+ * Clés de tri pour la table ordinateurs
  */
-export interface DashboardStats {
-  utilisateurs_total: number;
-  utilisateurs_actifs: number;
-  ordinateurs_total: number;
-  ordinateurs_assignes: number;
-  telephones_total: number;
-}
+export type OrdinateurSortKey = "nom" | "type" | "os" | "utilisateur";
 
 // ─── Types Audit ─────────────────────────────────────────────
 
@@ -153,7 +142,7 @@ export type AuditAction =
  * Structure d'un log d'audit
  */
 export interface AuditLog {
-  timestamp: string;
+  timestamp?: string;
   action: AuditAction;
   username?: string;
   ip: string;
@@ -161,7 +150,48 @@ export interface AuditLog {
   success: boolean;
 }
 
-// ─── Types DB (MySQL) ────────────────────────────────────────
+// ─── Types PDF (souples) ─────────────────────────────────────
+
+export type PdfTelephone = {
+  id?: number | string;
+  poste?: string | number | null;
+  lignes_internes?: string | null;
+  fixe?: string | null;
+  ligne_fixe?: string | null;
+  utilisateur_id?: number | string | null;
+  [k: string]: any;
+};
+
+export type PdfUtilisateur = {
+  id: number | string;
+  trigramme: string;
+  prenom: string;
+  nom: string;
+  mobiles?: string;
+  telephones?: string | PdfTelephone[];
+  poste?: string | number | null;
+  lignes_internes?: string | null;
+  fixe?: string | null;
+  ligne_fixe?: string | null;
+  [key: string]: any;
+};
+
+// ─── Types Annuaire (maps) ───────────────────────────────────
+
+export type ComputersByUserId = Record<number, Ordinateur[]>;
+export type PhonesByUserId = Record<number, Telephone[]>;
+
+// ─── Types Middleware / API ──────────────────────────────────
+
+export interface AuthContext {
+  username: string;
+  groups: string[];
+  ip: string;
+}
+
+export type ApiHandler = (req: import("next/server").NextRequest, context?: any) => Promise<import("next/server").NextResponse>;
+
+// ─── Types DB (MySQL2) ───────────────────────────────────────
 
 import type { RowDataPacket } from "mysql2";
 
@@ -185,9 +215,12 @@ export type ComputerRow = RowDataPacket & {
   id: number;
   nom: string;
   systeme_exploitation: string | null;
+  version?: string | null;
   utilisateur_id: number | null;
   type: string;
   prenom: string | null;
   nom_utilisateur: string | null;
   activite: number | null;
 };
+
+
