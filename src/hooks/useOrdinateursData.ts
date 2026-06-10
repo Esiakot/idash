@@ -1,3 +1,9 @@
+/**
+ * Hook de la page Ordinateurs.
+ * Rôle : gère la session, les filtres (type/statut/OS), le tri, et le chargement
+ * des données depuis l'API /api/ordinateurs/annuaire.
+ * Le fetch est réexécuté à chaque changement de filtre/tri (filtrage côté serveur).
+ */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -10,6 +16,10 @@ import type {
 } from "@/types";
 import { API_ROUTES, ERROR_MESSAGES } from "@/constants";
 
+/**
+ * Récupère la liste des ordinateurs avec leur utilisateur assigné + les facettes
+ * de filtres (valeurs distinctes pour OS, type…). Gère session, loading et erreurs.
+ */
 export function useOrdinateursData() {
   // Session
   const [session, setSession] = useState<ClientSession | null>(null);

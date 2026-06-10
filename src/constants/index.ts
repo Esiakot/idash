@@ -1,4 +1,9 @@
-// Constantes partagées pour l'application
+/**
+ * Constantes partagées de l'application SI Dashboard.
+ * Rôle : centraliser les valeurs littérales (groupes AD, codes HTTP, messages d'erreur,
+ * configuration cookies/DB/rate-limit…) pour éviter la duplication et faciliter la maintenance.
+ * Toute modification de comportement métier passe par ce fichier.
+ */
 
 // ─── Groupes d'accès ──────────────────────────────────────────
 

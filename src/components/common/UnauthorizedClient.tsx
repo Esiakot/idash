@@ -1,3 +1,10 @@
+/**
+ * Composant UnauthorizedClient - Vue "accès refusé".
+ * Utilisé dans : src/app/unauthorized/page.tsx.
+ * Affiche un message d'erreur + bouton "Se reconnecter" qui ouvre la modale de login
+ * via un événement custom écouté par le Header.
+ * Si une session devient valide pendant l'affichage, redirige vers la page d'origine.
+ */
 "use client";
 
 import { useEffect, useState } from "react";

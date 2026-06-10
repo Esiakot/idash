@@ -1,3 +1,9 @@
+/**
+ * Composant AssignPcModal - Modale d'assignation d'un ordinateur libre à un utilisateur.
+ * Utilisé dans : src/app/annuaire/page.tsx (action SI uniquement).
+ * Charge la liste des PC libres via GET /api/ordinateurs?free=true,
+ * puis assigne via POST /api/ordinateurs.
+ */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -13,6 +19,10 @@ type Props = {
   onAssigned: (pc: Ordinateur) => void;
 };
 
+/**
+ * Liste filtrable des PC libres ; au clic, valide l'assignation auprès de l'API
+ * et notifie le parent via onAssigned pour mettre à jour le cache local.
+ */
 export default function AssignPcModal({
   open,
   userId,

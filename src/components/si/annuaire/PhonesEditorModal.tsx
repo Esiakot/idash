@@ -1,3 +1,9 @@
+/**
+ * Composant PhonesEditorModal - Modale CRUD des téléphones fixes d'un utilisateur.
+ * Utilisé dans : src/app/annuaire/page.tsx (action SI uniquement).
+ * Permet d'ajouter, modifier et supprimer les paires (poste / lignes internes).
+ * Calcule un diff entre la liste initiale et l'éditée pour n'envoyer que les vraies modifs.
+ */
 "use client";
 
 import { useEffect, useState } from "react";

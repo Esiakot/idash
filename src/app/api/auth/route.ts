@@ -1,4 +1,11 @@
 // src/app/api/auth/route.ts
+/**
+ * Route /api/auth - Méthode : POST.
+ * Rôle : authentifier un utilisateur (samaccountname + mot de passe),
+ * vérifier le hash bcrypt, calculer ses groupes AD, et poser deux cookies signés
+ * (token + groupes) pour les requêtes suivantes.
+ * Auth : publique (endpoint de connexion). Protégé par rate-limiter par IP.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { authRateLimiter, getClientIp } from "@/middleware/rate-limiter";
@@ -13,6 +20,12 @@ import type { RowDataPacket } from "mysql2";
 
 export const runtime = "nodejs";
 
+/**
+ * POST /api/auth
+ * Body : { username, password }
+ * Réponse : { ok, username, groupes } + cookies auth_token et auth_groups (signés HMAC).
+ * Erreurs : 429 si rate-limit, 400 si données invalides, 401 si identifiants incorrects.
+ */
 export async function POST(req: NextRequest) {
   return withErrorHandler(async () => {
     // Rate limiting par IP
@@ -41,18 +54,19 @@ export async function POST(req: NextRequest) {
 
     const dbUser = rows[0];
     if (!dbUser || !dbUser.mot_de_passe) {
-      // Message générique pour ne pas révéler l'existence d'un utilisateur
+      // Message générique pour ne pas révéler l'existence d'un utilisateur (évite l'énumération de comptes)
       auditLogger.logAuthFailed(username, clientIp, "User not found or no password");
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
     }
 
+    // Comparaison bcrypt : protège contre les fuites de hash (lent, salé)
     const isMatch = await bcrypt.compare(password, dbUser.mot_de_passe);
     if (!isMatch) {
       auditLogger.logAuthFailed(username, clientIp, "Invalid password");
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, HTTP_STATUS.UNAUTHORIZED);
     }
 
-    // Récupération des groupes à partir des colonnes de la DB
+    // Reconstruction des groupes AD à partir des colonnes BIT(1) de la table utilisateurs
     const groups: string[] = [];
     for (const mapping of DB_GROUP_COLUMNS) {
       if (flagOn(dbUser[mapping.column])) {
@@ -63,6 +77,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Réinitialise le compteur de tentatives après succès
     authRateLimiter.reset(clientIp);
     auditLogger.logAuthSuccess(username, clientIp, groups);
 

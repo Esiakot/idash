@@ -1,6 +1,16 @@
 // src/libs/cookie-signer.ts
+/**
+ * Signature et vérification de cookies via HMAC-SHA256.
+ * Rôle : empêcher la falsification des cookies de session côté client
+ * (un attaquant ne peut pas forger un cookie sans connaître COOKIE_SECRET).
+ * Utilisé pour les cookies d'authentification (token + groupes AD).
+ */
 import { createHmac, timingSafeEqual } from "crypto";
 
+/**
+ * Récupère le secret HMAC depuis l'environnement et valide sa robustesse.
+ * Lance une erreur si COOKIE_SECRET est absent ou trop court (<32 caractères).
+ */
 function getSecret(): string {
   const secret = process.env.COOKIE_SECRET;
   if (!secret || secret.length < 32) {

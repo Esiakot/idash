@@ -1,3 +1,9 @@
+/**
+ * Composant UserPhones - Affiche les téléphones d'un utilisateur dans une cellule de tableau.
+ * Utilisé dans : AnnuaireTable.
+ * Props : tels (liste de téléphones), canEdit (affiche le bouton crayon),
+ * onEdit (callback d'ouverture de la modale d'édition).
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";

@@ -1,3 +1,9 @@
+/**
+ * Composant Toolbar - Barre d'outils de la page Annuaire.
+ * Utilisé dans : src/app/annuaire/page.tsx.
+ * Affiche le compteur d'utilisateurs filtrés, l'éventuel groupe survolé,
+ * le champ de recherche et un slot à droite pour le bouton d'export PDF.
+ */
 "use client";
 
 import { ReactNode } from "react";

@@ -1,4 +1,10 @@
 /**
+ * Helpers de formatage et normalisation utilisés dans toute l'app.
+ * Rôle : convertir les valeurs hétérogènes (Buffer MySQL BIT, string, number…)
+ * en valeurs exploitables côté UI, et nettoyer/formater l'affichage.
+ */
+
+/**
  * Normalise un flag DB (Buffer BIT(1), 1/0, bool, "✔", etc.) en boolean
  */
 export function flagOn(val: any): boolean {

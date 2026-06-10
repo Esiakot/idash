@@ -1,3 +1,8 @@
+/**
+ * Route /api/telephones - Méthodes : GET, POST, PUT, DELETE.
+ * Rôle : CRUD des téléphones fixes (poste + lignes internes), liés à un utilisateur.
+ * Auth : GET ouvert aux groupes autorisés ; POST/PUT/DELETE réservés au SI.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "@/libs/db";
 import { requireAnyGroup, requireGroup } from "@/middleware/auth-middleware";
@@ -11,7 +16,9 @@ import type { RowDataPacket } from "mysql2";
 
 export const runtime = "nodejs";
 
-// GET - Liste des téléphones
+/**
+ * GET /api/telephones - Liste des téléphones rattachés à un utilisateur.
+ */
 export async function GET(req: NextRequest) {
   return withErrorHandler(async () => {
     requireAnyGroup(req, GROUPS_AUTORISES);
@@ -28,7 +35,10 @@ export async function GET(req: NextRequest) {
   })(req);
 }
 
-// POST - Créer un téléphone
+/**
+ * POST /api/telephones - Crée un téléphone et le rattache à un utilisateur.
+ * Body : { poste, lignes_internes, utilisateur_id }.
+ */
 export async function POST(req: NextRequest) {
   return withErrorHandler(async () => {
     const auth = requireGroup(req, GROUP_SERVICE_INFO);
@@ -52,7 +62,10 @@ export async function POST(req: NextRequest) {
   })(req);
 }
 
-// PUT - Mettre à jour un téléphone
+/**
+ * PUT /api/telephones - Met à jour poste + lignes internes d'un téléphone existant.
+ * Body : { id, poste, lignes_internes }.
+ */
 export async function PUT(req: NextRequest) {
   return withErrorHandler(async () => {
     const auth = requireGroup(req, GROUP_SERVICE_INFO);
@@ -77,7 +90,9 @@ export async function PUT(req: NextRequest) {
   })(req);
 }
 
-// DELETE - Supprimer un téléphone
+/**
+ * DELETE /api/telephones - Supprime un téléphone par id.
+ */
 export async function DELETE(req: NextRequest) {
   return withErrorHandler(async () => {
     const auth = requireGroup(req, GROUP_SERVICE_INFO);

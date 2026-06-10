@@ -1,10 +1,18 @@
 // src/lib/api-wrapper.ts
+/**
+ * Wrapper centralisé pour les routes API Next.js.
+ * Rôle : intercepte les exceptions des handlers et les transforme en réponses HTTP cohérentes
+ * (ApiError métier, erreurs MySQL connues, erreur générique 500).
+ * Évite de dupliquer try/catch dans chaque route.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiHandler } from "@/types";
 import { HTTP_STATUS, ERROR_MESSAGES, MYSQL_ERRORS } from "@/constants";
 
 /**
- * Erreur API personnalisée
+ * Erreur API personnalisée portant un code HTTP et des détails optionnels.
+ * Permet de remonter une erreur typée depuis n'importe quelle couche
+ * (validation, auth, métier) qui sera convertie en JSON par withErrorHandler.
  */
 export class ApiError extends Error {
   constructor(

@@ -1,3 +1,10 @@
+/**
+ * Composant ExportPdfButton - Bouton d'export PDF de l'annuaire.
+ * Utilisé dans : Toolbar (page Annuaire).
+ * Génère un PDF avec jsPDF + autoTable à partir des utilisateurs filtrés,
+ * en résolvant les téléphones via les helpers pdf-helpers.
+ * Les libs sont chargées dynamiquement (import()) pour ne pas alourdir le bundle initial.
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";

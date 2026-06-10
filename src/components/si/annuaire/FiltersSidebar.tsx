@@ -1,3 +1,11 @@
+/**
+ * Composant FiltersSidebar - Panneau de filtres latéral de l'Annuaire.
+ * Utilisé dans : src/app/annuaire/page.tsx.
+ * Permet de filtrer la liste des utilisateurs par : activité (actif/inactif),
+ * type (utilisateur/autre/stagiaire), épingler les leaders, et basculer
+ * l'affichage des colonnes de groupes AD.
+ * Tous les états sont remontés via callbacks (composant contrôlé).
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";

@@ -1,4 +1,10 @@
 // src/middleware/auth-middleware.ts
+/**
+ * Helpers d'authentification utilisés dans les routes API.
+ * Rôle : extraire la session depuis les cookies signés (token + groupes AD)
+ * et exposer requireAuth / requireGroup / requireAnyGroup qui lancent une
+ * ApiError 401/403 si l'accès n'est pas autorisé.
+ */
 import { NextRequest } from "next/server";
 import { ApiError } from "@/libs/api-wrapper";
 import { unsignCookie } from "@/libs/cookie-signer";

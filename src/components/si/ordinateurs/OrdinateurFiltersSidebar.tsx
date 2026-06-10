@@ -1,3 +1,10 @@
+/**
+ * Composant OrdinateurFiltersSidebar - Panneau latéral de filtres de la page Ordinateurs.
+ * Utilisé dans : src/app/ordinateurs/page.tsx.
+ * Permet de filtrer par : type (Station/Serveur/Portable…), statut d'affectation
+ * (Tous/Affecté/Non affecté), système d'exploitation. Les options viennent des facettes
+ * calculées par l'API (valeurs distinctes en base).
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";

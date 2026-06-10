@@ -1,3 +1,10 @@
+/**
+ * Route /api/ordinateurs/annuaire - Méthode : GET.
+ * Rôle : alimenter la page Ordinateurs avec la liste filtrée/triée + les facettes
+ * (valeurs distinctes pour les filtres) et les statistiques globales.
+ * Une seule requête réseau pour le client = moins de RTT, UI réactive.
+ * Auth : requise.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "@/libs/db";
 import { requireAuth } from "@/middleware/auth-middleware";
@@ -9,7 +16,12 @@ import type { TypeRow, OSRow, CountRow, ComputerRow } from "@/types";
 
 export const runtime = "nodejs";
 
-// GET - Liste des ordinateurs avec facettes et filtres
+/**
+ * GET /api/ordinateurs/annuaire
+ * Query : type, status (Tous|Affecté|Non affecté), os, sortBy, sortDir (validés par Zod).
+ * Réponse : { computers, facets: { types, osList, stats } }.
+ * Optimisation : 4 requêtes parallèles (données + 3 facettes) via Promise.all.
+ */
 export async function GET(req: NextRequest) {
   return withErrorHandler(async () => {
     requireAuth(req);
@@ -34,6 +46,8 @@ export async function GET(req: NextRequest) {
       LEFT JOIN utilisateurs u ON o.utilisateur_id = u.id
     `;
 
+    // Construction dynamique du WHERE en accumulant les conditions selon les filtres actifs.
+    // Les valeurs sont passées en placeholders (?) pour prévenir les injections SQL.
     const whereClauses: string[] = [];
     const params: any[] = [];
 
@@ -58,6 +72,8 @@ export async function GET(req: NextRequest) {
     const whereSql = whereClauses.length
       ? `WHERE ${whereClauses.join(" AND ")}`
       : "";
+    // sortBy est validé par Zod parmi un enum, ORDINATEUR_SORT_MAP fournit la colonne SQL
+    // réelle correspondante (jamais d'interpolation directe d'une valeur user dans l'ORDER BY).
     const orderCol = ORDINATEUR_SORT_MAP[sortBy] ?? "o.nom";
     const orderSql = `ORDER BY ${orderCol} ${sortDir}`;
 

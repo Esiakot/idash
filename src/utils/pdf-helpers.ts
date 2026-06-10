@@ -1,10 +1,17 @@
 /**
  * Helpers dédiés à l'export PDF de l'annuaire.
+ * Rôle : résoudre les téléphones d'un utilisateur (sources multiples possibles)
+ * et formater postes/lignes internes en chaînes affichables dans les colonnes du PDF.
+ * Utilisé par ExportPdfButton.tsx avec jsPDF + autoTable.
  */
 import type { PdfTelephone, PdfUtilisateur } from "@/types";
 
 // ———————————— Helpers ————————————
 
+/**
+ * Extrait le numéro de ligne fixe d'un objet en testant plusieurs noms de champs possibles
+ * (la structure des données PDF peut varier selon la source).
+ */
 export function normFixeFromObj(anyObj: Record<string, any> = {}): string {
   return (
     anyObj.lignes_internes ??
@@ -16,6 +23,10 @@ export function normFixeFromObj(anyObj: Record<string, any> = {}): string {
   );
 }
 
+/**
+ * Recherche les téléphones par utilisateur_id en parcourant tout le map
+ * (fallback quand l'index direct ne donne rien).
+ */
 function findByUtilisateurId(
   phonesByUserId: Record<string | number, PdfTelephone[]>,
   uid: string | number,

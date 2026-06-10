@@ -1,3 +1,10 @@
+/**
+ * Composant Header - Barre de navigation principale.
+ * Utilisé dans : layout.tsx (rendu sur toutes les pages).
+ * Affiche le logo, le nom de l'utilisateur connecté et le bouton login/logout.
+ * Écoute l'événement custom EVENTS.OPEN_LOGIN_MODAL pour permettre à d'autres pages
+ * (ex : UnauthorizedClient) de déclencher l'ouverture de la modale de connexion.
+ */
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -16,6 +23,7 @@ const Header = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Déconnexion : appelle DELETE /api/session pour effacer les cookies, puis retour accueil
   const handleLogout = async () => {
     await fetch(API_ROUTES.SESSION, { method: "DELETE" });
     setUsername(null);
@@ -23,6 +31,7 @@ const Header = () => {
     router.push("/");
   };
 
+  // Récupère la session courante depuis l'API et met à jour l'état local
   const checkSession = useCallback(async () => {
     const res = await fetch(API_ROUTES.SESSION);
     if (res.ok) {
@@ -40,6 +49,8 @@ const Header = () => {
     }
   }, []);
 
+  // Au montage : vérifie la session + abonne le composant à l'événement custom
+  // qui permet à d'autres pages de déclencher l'ouverture de la modale.
   useEffect(() => {
     checkSession();
 
@@ -50,6 +61,7 @@ const Header = () => {
     };
   }, [checkSession]);
 
+  // Après connexion réussie : rafraîchit la session et redirige vers la page d'origine si présente.
   const handleLoginSuccess = useCallback((user: string) => {
     setUsername(user);
     checkSession();

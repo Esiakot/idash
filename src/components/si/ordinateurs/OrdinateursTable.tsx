@@ -1,3 +1,9 @@
+/**
+ * Composant OrdinateursTable - Tableau des ordinateurs du parc.
+ * Utilisé dans : src/app/ordinateurs/page.tsx.
+ * Affiche : nom, type, OS, utilisateur assigné et statut (affecté/non affecté).
+ * Tri serveur via SortableHeader (cliquer change sortBy/sortDir, qui déclenche un fetch).
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";

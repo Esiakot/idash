@@ -1,4 +1,10 @@
 // src/services/audit-logger.ts
+/**
+ * Journalisation des actions sensibles de l'application (audit trail).
+ * Rôle : tracer qui fait quoi (auth, modifs téléphone/ordinateur, accès refusés)
+ * pour la sécurité et la conformité. En dev : sortie console lisible.
+ * En prod : JSON structuré exploitable par un agrégateur de logs.
+ */
 import type { AuditAction, AuditLog } from "@/types";
 
 /**

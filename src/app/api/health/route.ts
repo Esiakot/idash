@@ -1,4 +1,10 @@
 // src/app/api/health/route.ts
+/**
+ * Route /api/health - Méthode : GET.
+ * Rôle : vérifier l'état de l'application (DB joignable + variables d'env critiques).
+ * Auth : publique (utilisée par Docker / monitoring).
+ * Réponse : { status: healthy|degraded|unhealthy, checks } avec code 200 ou 503.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "@/libs/db";
 import { REQUIRED_ENV_VARS, HTTP_STATUS, HEALTH_STATUS } from "@/constants";

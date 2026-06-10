@@ -1,4 +1,11 @@
 // src/middleware/rate-limiter.ts
+/**
+ * Rate limiter en mémoire utilisé pour protéger les endpoints sensibles
+ * (notamment l'authentification) contre le brute-force.
+ * Rôle : limiter le nombre de tentatives par IP sur une fenêtre glissante.
+ * Limitation : stockage local au process — en production multi-instance,
+ * il faudrait basculer sur Redis pour partager les compteurs.
+ */
 import { RATE_LIMIT } from "@/constants";
 
 /**

@@ -1,4 +1,10 @@
 // src/validations/index.ts
+/**
+ * Schémas de validation Zod centralisés.
+ * Rôle : valider les corps de requêtes et query params côté serveur (API)
+ * et côté client (formulaires) avec une seule source de vérité.
+ * Les messages sont en français pour être affichés directement à l'utilisateur.
+ */
 import { z } from "zod";
 import { ASSIGNMENT_STATUS } from "@/constants";
 

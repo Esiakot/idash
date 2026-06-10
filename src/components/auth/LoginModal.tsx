@@ -1,3 +1,8 @@
+/**
+ * Composant LoginModal - Modale de connexion.
+ * Utilisé dans : Header (bouton "Se connecter") et UnauthorizedClient (événement custom).
+ * Rendu via createPortal sur document.body pour s'affranchir du contexte CSS local.
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";
@@ -10,12 +15,18 @@ interface Props {
   onLoginSuccess: (username: string) => void;
 }
 
+/**
+ * Formulaire username/password qui appelle POST /api/auth.
+ * Sur succès : appelle onLoginSuccess avec le username puis ferme la modale.
+ * Sur échec : affiche le message d'erreur retourné par l'API.
+ */
 const LoginModal = ({ onClose, onLoginSuccess }: Props) => {
   const [mounted, setMounted] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // mounted=true uniquement côté client : évite l'erreur de createPortal en SSR
   useEffect(() => {
     setMounted(true);
   }, []);

@@ -1,4 +1,9 @@
 // src/utils/request-helpers.ts
+/**
+ * Helpers utilisés dans les routes API pour parser et valider les entrées.
+ * Rôle : centraliser le parsing des params de route, du body JSON et des query params,
+ * en levant des ApiError formalisées au moindre problème (évite de polluer chaque route).
+ */
 import { NextRequest } from "next/server";
 import { ZodSchema } from "zod";
 import { ApiError } from "@/libs/api-wrapper";

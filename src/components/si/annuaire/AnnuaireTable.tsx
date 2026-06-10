@@ -1,3 +1,10 @@
+/**
+ * Composant AnnuaireTable - Tableau principal de l'annuaire.
+ * Utilisé dans : src/app/annuaire/page.tsx.
+ * Affiche une ligne par utilisateur avec : trigramme, nom, prénom, type, activité,
+ * mobile, téléphones fixes, ordinateurs assignés et colonnes dynamiques de groupes AD.
+ * Le tri (cycle 3 états) et l'affichage conditionnel des actions SI sont remontés par les hooks.
+ */
 "use client";
 
 import { useMemo } from "react";

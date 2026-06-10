@@ -1,8 +1,17 @@
+/**
+ * Hooks de persistance dans le localStorage du navigateur.
+ * Rôle : factoriser le pattern useState + lecture/écriture localStorage,
+ * utilisé partout pour conserver les filtres et tri entre les visites.
+ * Tous les hooks gèrent le SSR (window indisponible) en retournant la valeur par défaut.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
 import type { SortDirection } from "@/types";
 
+/**
+ * Persiste un booléen dans localStorage. Convention de stockage : "true"/"false".
+ */
 export function useLocalStorageBool(key: string, defaultValue = true): [boolean, (v: boolean) => void] {
   const [value, setValue] = useState<boolean>(() => {
     if (typeof window === "undefined") return defaultValue;
@@ -18,6 +27,9 @@ export function useLocalStorageBool(key: string, defaultValue = true): [boolean,
   return [value, setValue];
 }
 
+/**
+ * Persiste une chaîne de caractères (ex : terme de recherche).
+ */
 export function useLocalStorageString(key: string, defaultValue = ""): [string, (v: string) => void] {
   const [value, setValue] = useState<string>(() => {
     if (typeof window === "undefined") return defaultValue;
@@ -32,6 +44,10 @@ export function useLocalStorageString(key: string, defaultValue = ""): [string, 
   return [value, setValue];
 }
 
+/**
+ * Persiste un objet JSON sérialisable. Tombe sur defaultValue si parsing impossible
+ * (données corrompues par une mise à jour de schema).
+ */
 export function useLocalStorageJson<T>(key: string, defaultValue: T): [T, (v: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => {
     if (typeof window === "undefined") return defaultValue;
@@ -52,6 +68,10 @@ export function useLocalStorageJson<T>(key: string, defaultValue: T): [T, (v: T 
   return [value, setValue];
 }
 
+/**
+ * Persiste l'état de tri d'un tableau (colonne + direction) sous deux clés préfixées.
+ * Le préfixe permet d'avoir des tris indépendants entre tableaux (ex : annuaire vs ordinateurs).
+ */
 export function useLocalStorageSort(prefix = ""): {
   sortColumn: string | null;
   setSortColumn: (v: string | null) => void;

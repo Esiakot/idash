@@ -1,3 +1,9 @@
+/**
+ * Composant HubGrid - Page d'accueil avec cartes de navigation.
+ * Utilisé dans : src/app/page.tsx (route /).
+ * Affiche un titre, un sous-titre et une grille de cartes vers les sections principales
+ * (Annuaire, Ordinateurs).
+ */
 import Link from "next/link";
 import styles from "@/styles/si/si.module.css";
 
@@ -6,6 +12,9 @@ interface HubGridProps {
   subtitle: string;
 }
 
+/**
+ * Affiche les cartes Annuaire et Ordinateurs avec descriptions et tags.
+ */
 export default function HubGrid({ title, subtitle }: HubGridProps) {
   return (
     <div className={styles.container}>

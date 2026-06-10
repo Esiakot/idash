@@ -1,6 +1,9 @@
 // src/types/index.ts
 /**
- * Types partagés de l'application
+ * Types TypeScript partagés de l'application.
+ * Rôle : définir les contrats entre l'API, les hooks et les composants
+ * (utilisateurs, ordinateurs, téléphones, session, audit…).
+ * Une seule source de vérité évite les divergences côté client/serveur.
  */
 
 // ─── Types de base Ordinateur ────────────────────────────────

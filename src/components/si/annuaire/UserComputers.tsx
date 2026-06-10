@@ -1,3 +1,9 @@
+/**
+ * Composant UserComputers - Affiche les ordinateurs assignés à un utilisateur dans une cellule.
+ * Utilisé dans : AnnuaireTable.
+ * Props : pcs (liste d'ordinateurs), canEdit (active le bouton de désassignation),
+ * onUnassign (callback de désassignation).
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";

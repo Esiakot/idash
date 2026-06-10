@@ -1,3 +1,9 @@
+/**
+ * Composant MobileEditorModal - Modale d'édition du numéro mobile d'un utilisateur.
+ * Utilisé dans : src/app/annuaire/page.tsx.
+ * Récupère la valeur courante via GET /api/utilisateurs/:id/mobile et la met à jour
+ * via PATCH. Formaté à la saisie via formatPhone (06 12 34 56 78).
+ */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,6 +20,9 @@ type Props = {
   onSaved: (newMobile: string) => void; // après sauvegarde, valeur à refléter côté UI ("" si NULL)
 };
 
+/**
+ * Formulaire d'édition du numéro mobile, chargé à l'ouverture si userId fourni.
+ */
 export default function MobileEditorModal({
   open,
   userId,

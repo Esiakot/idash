@@ -1,3 +1,9 @@
+/**
+ * Hooks de la page Annuaire.
+ * Rôle : isole la logique métier (chargement des données, gestion des modales,
+ * filtres et tri persistants en localStorage) du composant de page,
+ * pour garder la page lisible et faciliter les tests/maintenance.
+ */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -11,8 +17,14 @@ import {
   useLocalStorageSort,
 } from "@/hooks/useLocalStorage";
 
-// ─── useAnnuaireData ─────────────────────────────────────────
+// ─── useAnnuaireData ─────────────────────────────
 
+/**
+ * Charge en parallèle : la session, les utilisateurs, les ordinateurs et les téléphones.
+ * Indexe les ordinateurs et téléphones par utilisateur_id pour des lookups O(1)
+ * dans le tableau de l'annuaire.
+ * Expose aussi `isServiceInfo` qui débloque les actions d'édition réservées au SI.
+ */
 export function useAnnuaireData() {
   const [users, setUsers] = useState<Utilisateur[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,8 +100,12 @@ interface AnnuaireActionsInput {
   setPhonesByUserId: React.Dispatch<React.SetStateAction<PhonesByUserId>>;
   setUsers: React.Dispatch<React.SetStateAction<Utilisateur[]>>;
 }
-
-export function useAnnuaireActions({
+/**
+ * Centralise les actions d'édition (assigner/désassigner un PC, éditer téléphones et mobile).
+ * Gère l'état d'ouverture des modales et met à jour le cache local après succès
+ * pour éviter un nouveau fetch complet (UX réactive).
+ * Toutes les actions sont no-op si l'utilisateur n'appartient pas au SI.
+ */export function useAnnuaireActions({
   isServiceInfo,
   setComputersByUserId,
   setPhonesByUserId,
@@ -212,6 +228,10 @@ export function useAnnuaireActions({
 
 const categories = ANNUAIRE_CATEGORIES;
 
+/**
+ * Normalise une chaîne pour la recherche : retire les accents, met en minuscule, trim.
+ * Permet une recherche tolérante (ex : "élise" = "elise").
+ */
 function norm(s: any) {
   return (s ?? "")
     .toString()
@@ -221,6 +241,13 @@ function norm(s: any) {
     .trim();
 }
 
+/**
+ * Calcule la liste filtrée/triée des utilisateurs selon les critères persistés en localStorage.
+ * Filtres supportés : activité (actif/inactif), type (utilisateur/autre/stagiaire),
+ * groupes AD, recherche texte multi-champs (nom, téléphones, ordinateurs, groupes…).
+ * Le tri par colonne suit un cycle 3 états : asc → desc → aucun.
+ * Les utilisateurs "épinglés" (PIN_TRIGRAMMES) remontent toujours en premier.
+ */
 export function useAnnuaireFilters(
   users: Utilisateur[],
   computersByUserId: ComputersByUserId,

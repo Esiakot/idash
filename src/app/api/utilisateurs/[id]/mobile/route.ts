@@ -1,3 +1,8 @@
+/**
+ * Route /api/utilisateurs/[id]/mobile - Méthodes : GET, PATCH.
+ * Rôle : lire et modifier le numéro mobile d'un utilisateur (champ séparé du téléphone fixe).
+ * Auth : réservé au groupe Glo_ServiceInfo (donnée modifiable uniquement par le SI).
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { requireGroup } from "@/middleware/auth-middleware";
 import { withErrorHandler } from "@/libs/api-wrapper";
@@ -9,7 +14,9 @@ import { UpdateMobileSchema } from "@/validations";
 
 export const runtime = "nodejs";
 
-// GET - Récupérer le numéro mobile d'un utilisateur
+/**
+ * GET /api/utilisateurs/:id/mobile - Retourne le numéro mobile actuel.
+ */
 export async function GET(
   req: NextRequest,
   context: { params: { id: string } | Promise<{ id: string }> }
@@ -32,7 +39,11 @@ export async function GET(
   })(req);
 }
 
-// PATCH - Mettre à jour le numéro mobile d'un utilisateur
+/**
+ * PATCH /api/utilisateurs/:id/mobile - Met à jour le numéro mobile.
+ * Body : { mobile } (validé par UpdateMobileSchema, format souple).
+ * Loggué dans l'audit (USER_MOBILE_UPDATE) car donnée personnelle modifiée.
+ */
 export async function PATCH(
   req: NextRequest,
   context: { params: { id: string } | Promise<{ id: string }> }

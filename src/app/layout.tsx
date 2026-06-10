@@ -1,3 +1,9 @@
+/**
+ * Layout racine de l'application Next.js (App Router).
+ * Rôle : appliquer le HTML/body, les fonts Geist, le Header global,
+ * et envelopper les pages dans un Suspense pour les hooks de navigation.
+ * S'applique à toutes les routes (sauf si un layout enfant le surcharge).
+ */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
@@ -15,6 +21,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/**
+ * Layout par défaut englobant toutes les pages.
+ * Le Suspense est requis car Header utilise useSearchParams (compatible SSR).
+ */
 export default function RootLayout({
   children,
 }: {

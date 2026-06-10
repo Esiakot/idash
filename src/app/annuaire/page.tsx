@@ -1,3 +1,9 @@
+/**
+ * Page Annuaire - Route : /annuaire
+ * Rôle : composer la barre de filtres, la barre d'outils, le tableau et les modales
+ * d'édition (assignation PC, téléphones, mobile). Toute la logique est dans les hooks.
+ * Accès : tout utilisateur authentifié (mais l'édition nécessite Glo_ServiceInfo).
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";
@@ -10,6 +16,10 @@ import PhonesEditorModal from "@/components/si/annuaire/PhonesEditorModal";
 import MobileEditorModal from "@/components/si/annuaire/MobileEditorModal";
 import { useAnnuaireData, useAnnuaireFilters, useAnnuaireActions } from "@/hooks/useAnnuaire";
 
+/**
+ * Composant de page : orchestre les 3 hooks (data, filters, actions)
+ * et câble les composants enfants. Affiche un état de chargement / d'erreur.
+ */
 export default function Page() {
   const {
     users,

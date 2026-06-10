@@ -1,3 +1,9 @@
+/**
+ * Page Ordinateurs - Route : /ordinateurs
+ * Rôle : afficher la liste filtrable/triable des ordinateurs du parc avec leurs facettes.
+ * Toute la logique (chargement, filtres, tri) est dans le hook useOrdinateursData.
+ * Accès : tout utilisateur authentifié.
+ */
 "use client";
 
 import styles from "@/styles/si/shared.module.css";
@@ -5,6 +11,9 @@ import { useOrdinateursData } from "@/hooks/useOrdinateursData";
 import OrdinateurFiltersSidebar from "@/components/si/ordinateurs/OrdinateurFiltersSidebar";
 import OrdinateursTable from "@/components/si/ordinateurs/OrdinateursTable";
 
+/**
+ * Composant de page : compose la sidebar de filtres, la toolbar et le tableau.
+ */
 export default function PageOrdinateurs() {
   const {
     sessionLoading,
